@@ -1,0 +1,15 @@
+.image {
+  width: 45px;
+  border-radius: 50%;
+  margin-right: 30px;
+}
+.button{
+    position: relative;
+    top: 20px;
+}
+.menuItem {
+  background: #001529 !important;
+}
+.footer {
+  color: #0a5628;
+}
