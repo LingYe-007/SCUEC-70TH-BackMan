@@ -7,9 +7,20 @@
     position: relative;
     top: 20px;
 }
+.item{
+  position: absolute;
+  right: 0px;
+}
+.span{
+  cursor: pointer;
+}
+.menu{
+  position: relative;
+}
 .menuItem {
+  color: #1890ff !important;
   background: #001529 !important;
 }
 .footer {
-  color: #0a5628;
+  color: #001529 !important;
 }

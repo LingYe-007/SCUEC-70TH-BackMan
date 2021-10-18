@@ -9,7 +9,7 @@ export function login(useData:any) {
 
 // 2.获取待审核的文章
 export function posts() {
-  return request.get(baseUrl + "/msg/list");
+  return request.get(baseUrl + "/msg/reviewlist");
 }
 
 // 3.审核留言通过
