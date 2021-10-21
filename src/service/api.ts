@@ -14,15 +14,20 @@ export function posts() {
 
 // 3.审核留言通过
 export function pass(msgId: string) {
-  return request.get(baseUrl + "/msg/reviewPass" + msgId);
+  return request.get(baseUrl + "/msg/reviewPass?msgid=" + msgId);
 }
 
 // 4.审核留言不通过
 export function noPass(msgId: string) {
-  return request.get(baseUrl + "/msg/reviewdel?msgid=2" + msgId);
+  return request.get(baseUrl + "/msg/reviewdel?msgid=" + msgId);
 }
 
 // 5.统计点星总数
 export function total() {
   return request.get(baseUrl + "/count/total");
+}
+
+// 6.学院表单
+export function college(){
+  return request.get(baseUrl+"/count/collegeList")
 }

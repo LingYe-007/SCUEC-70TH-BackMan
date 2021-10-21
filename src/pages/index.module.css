@@ -7,6 +7,9 @@
     position: relative;
     top: 20px;
 }
+.row{
+  margin: 20px 0;
+}
 .item{
   position: absolute;
   right: 0px;
@@ -23,4 +26,7 @@
 }
 .footer {
   color: #001529 !important;
+}
+.footer>text{
+  color: #1890ff !important;
 }

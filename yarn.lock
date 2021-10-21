@@ -11202,10 +11202,10 @@ typedarray@^0.0.6:
   resolved "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.4.4:
-  version "4.4.4"
-  resolved "https://registry.npmmirror.com/typescript/download/typescript-4.4.4.tgz"
-  integrity sha1-LNAaGh8WBwTTEB/VpY/w+fy4Aww=
+typescript@^4.1.0-dev.20201023:
+  version "4.1.0-dev.20201023"
+  resolved "https://registry.npmmirror.com/typescript/download/typescript-4.1.0-dev.20201023.tgz#f08b7a847993ce7650e9057fdbf50614c30ad5d1"
+  integrity sha1-8It6hHmTznZQ6QV/2/UGFMMK1dE=
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"

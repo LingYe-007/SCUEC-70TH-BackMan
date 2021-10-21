@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Layout,
+  Tag,
   Menu,
   Input,
   Modal,
@@ -8,7 +9,12 @@ import {
   Checkbox,
   Button,
   Table,
-  Progress
+  Row,
+  Select,
+  Progress,
+  message,
+  Col,
+  Statistic,
 } from "antd";
 import { useState, useEffect } from "react";
 import { UserOutlined, LockOutlined, LaptopOutlined } from "@ant-design/icons";
@@ -16,34 +22,189 @@ import * as api from "../service/api";
 import styles from "./index.module.css";
 import "antd/dist/antd.css";
 
+const { Option } = Select;
+
 const Index = () => {
   const { Header, Content, Sider, Footer } = Layout;
   const [show, setShow] = useState(false);
   const [posts, setPosts] = useState(null);
-  const [stars,setStars] = useState(null)
-  const [user,setUser] =useState(null)
-  const [login, setLogin] = useState(false);
-  const [current, setCurrent] = useState(false);
+  const [stars, setStars] = useState(null);
+  const [user, setUser] = useState(null);
+  const [college, setCollege] = useState(null);
+  const [login] = useState(false);
+  const [current, setCurrent] = useState(true);
+
   useEffect(() => {
     const getData = async () => {
-      let result = await api.posts();
-      console.log("result", result);
-      let stars = await api.total()
-      console.log('stars',stars)
-      setStars(stars.Data.Star)
-      setUser(stars.Data.User)
-      setPosts(result.data);
+      let stars = await api.total();
+      console.log("stars", stars);
+      let college = await api.college();
+      console.log("college", college);
+      setCollege(college.Data);
+      setStars(stars.Data.Star);
+      setUser(stars.Data.User);
     };
     getData();
-  },[stars,posts]);
+  }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+      let list = await api.posts();
+      if (list.Data) {
+        for (let i = 0; i < list.Data.length; i++) {
+          list.Data[i]["status"] = 0;
+        }
+      }
+      console.log(list.Data);
+      setPosts(list.Data);
+    };
+    getData();
+  }, []);
+
+  const success = () => {
+    message.success("审核通过");
+  };
+
+  const info = () => {
+    message.info("留言已经删除,无法找回");
+  };
+
+  const sort = (e) => {
+    // console.log(e);
+    let newCol = null;
+    if (e === "desc") {
+      newCol = college.sort((a, b) => {
+        return a.Star - b.Star;
+      });
+    } else {
+      newCol = college.sort((a, b) => {
+        return b.Star - a.Star;
+      });
+    }
+    console.log(newCol);
+    setCollege([...newCol]);
+  };
+
   const onFinish = async (values) => {
     console.log("values", values);
     let result = await api.login(values);
     console.log("result", result);
-    if (result === 400) {
-    } else {
-    }
   };
+
+  const columns = [
+    {
+      title: "姓名",
+      dataIndex: "replyname",
+      key: "replyname",
+    },
+    {
+      title: "学院",
+      dataIndex: "college",
+      key: "college",
+    },
+    {
+      title: "留言信息",
+      dataIndex: "replymsg",
+      key: "replymsg",
+    },
+    {
+      title: "留言时间",
+      dataIndex: "replytime",
+      key: "replytime",
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      key: "status",
+      render: (e) => {
+        const render = function () {
+          if (e === 1) {
+            return <Tag color="green">已通过</Tag>;
+          } else if (e === -1) {
+            return <Tag color="red">已删除</Tag>;
+          } else {
+            return <Tag color="orange">待审核</Tag>;
+          }
+        };
+        return render();
+      },
+    },
+    {
+      title: "审核通过",
+      dataIndex: "msg_id",
+      key: "msg_id",
+      render: (e) => {
+        return (
+          <Button
+            type="primary"
+            ghost
+            onClick={() => {
+              let change = posts.filter((item) => {
+                return item.msg_id === e;
+              });
+              posts[posts.indexOf(change[0])]["status"] = 1;
+              setPosts([...posts]);
+              api.pass(e);
+              success();
+            }}
+          >
+            通过
+          </Button>
+        );
+      },
+    },
+    {
+      title: "删除留言",
+      dataIndex: "msg_id",
+      key: "msg_id",
+      render: (e) => {
+        return (
+          <Button
+            danger
+            ghost
+            onClick={() => {
+              let change = posts.filter((item) => {
+                return item.msg_id === e;
+              });
+              posts[posts.indexOf(change[0])]["status"] = -1;
+              setPosts([...posts]);
+              api.noPass(e);
+              info();
+            }}
+          >
+            失败
+          </Button>
+        );
+      },
+    },
+  ];
+
+  const columnsTwo = [
+    {
+      title: "学院",
+      dataIndex: "collegename",
+      key: "collegename",
+    },
+    {
+      title: "点星数",
+      dataIndex: "star",
+      key: "star",
+    },
+    {
+      title: (
+        <Select defaultValue="asce" onChange={sort}>
+          <Option value="desc">降序</Option>
+          <Option value="asce">升序</Option>
+        </Select>
+      ),
+      dataIndex: "star",
+      key: "star",
+      render: (e) => {
+        console.log(e);
+        return <Progress percent={100 * (e / stars)} size="small" />;
+      },
+    },
+  ];
 
   return (
     <Layout>
@@ -75,10 +236,14 @@ const Index = () => {
         </Menu>
       </Header>
       <Layout>
-        <Sider width={194} className="site-layout-background">
+        <Sider
+          width={194}
+          defaultSelectedKeys={["sub1"]}
+          className="site-layout-background"
+        >
           <Menu
             theme="dark"
-            defaultSelectedKeys={["1"]}
+            defaultSelectedKeys={["sub1"]}
             defaultOpenKeys={["sub1"]}
             style={{ height: "100%", borderRight: 0 }}
           >
@@ -98,9 +263,9 @@ const Index = () => {
                 setCurrent(false);
               }}
               icon={<LaptopOutlined />}
-              title="点星总量"
+              title="学院点星"
             >
-              点星总量
+              学院点星
             </Menu.Item>
           </Menu>
         </Sider>
@@ -109,6 +274,7 @@ const Index = () => {
             <Modal
               title="管理员登陆"
               visible={show}
+              centered
               footer={null}
               // onOK={doLogin}
               onCancel={() => {
@@ -169,20 +335,24 @@ const Index = () => {
             </Modal>
             {current ? (
               <div>
-                <Progress
-                  type="circle"
-                  percent={stars}
-                  format={(stars) => `${stars} stars`}
-                />
-                <Progress type="circle" percent={user} format={(user) => `${user}Done`} />
-                <Table dataSource={posts}></Table>
+                <Row gutter={16} className={styles.row}>
+                  <Col span={12}>
+                    <Statistic title="活跃用户" value={user} />
+                  </Col>
+                  <Col span={12}>
+                    <Statistic title="点亮星数" value={stars} />
+                  </Col>
+                </Row>
+                ​ <Table dataSource={posts} columns={columns}></Table>
               </div>
             ) : (
-              "算了,放一个页面好了"
+              <Table dataSource={college} columns={columnsTwo}></Table>
             )}
           </Content>
           <Footer className={styles.footer}>
-            70TH SCUEC@2021 Created by LingYe
+            *为了性能,删除或是pass的数据会暂时不会删除,状态发生改变,刷新页面后数据一起删除。
+            <br></br>
+            <text> 70TH SCUEC@2021 Created by LingYe</text>
           </Footer>
         </Layout>
       </Layout>
