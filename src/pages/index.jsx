@@ -69,16 +69,24 @@ const Index = () => {
     message.info("留言已经删除,无法找回");
   };
 
+  const loginSuccess = () => {
+    message.success("登陆成功");
+  };
+
+  const loginFail = () => {
+    message.warn("登陆失败");
+  };
+
   const sort = (e) => {
     // console.log(e);
     let newCol = null;
     if (e === "desc") {
       newCol = college.sort((a, b) => {
-        return a.Star - b.Star;
+        return a.star - b.star;
       });
     } else {
       newCol = college.sort((a, b) => {
-        return b.Star - a.Star;
+        return b.star - a.star;
       });
     }
     console.log(newCol);
@@ -88,7 +96,12 @@ const Index = () => {
   const onFinish = async (values) => {
     console.log("values", values);
     let result = await api.login(values);
-    console.log("result", result);
+    // console.log("result", result);
+    if (result.code !== 200) {
+      loginFail();
+    } else {
+      loginSuccess();
+    }
   };
 
   const columns = [
@@ -111,6 +124,12 @@ const Index = () => {
       title: "留言时间",
       dataIndex: "replytime",
       key: "replytime",
+      sorter: {
+        compare: (a, b) => {
+          return a.replymsg - b.replymsg;
+        },
+        // multiple: 3,
+      },
     },
     {
       title: "状态",
@@ -179,6 +198,11 @@ const Index = () => {
     },
   ];
 
+  const pagination = {
+    // current: 1,
+    pageSize: 7,
+    total: posts?.length,
+  };
   const columnsTwo = [
     {
       title: "学院",
@@ -192,7 +216,7 @@ const Index = () => {
     },
     {
       title: (
-        <Select defaultValue="asce" onChange={sort}>
+         <Select defaultValue="asce" onChange={sort}>
           <Option value="desc">降序</Option>
           <Option value="asce">升序</Option>
         </Select>
@@ -276,7 +300,6 @@ const Index = () => {
               visible={show}
               centered
               footer={null}
-              // onOK={doLogin}
               onCancel={() => {
                 setShow(false);
               }}
@@ -327,6 +350,7 @@ const Index = () => {
                     type="primary"
                     htmlType="submit"
                     className={styles.button}
+                    classNam
                   >
                     Submit
                   </Button>
@@ -343,7 +367,12 @@ const Index = () => {
                     <Statistic title="点亮星数" value={stars} />
                   </Col>
                 </Row>
-                ​ <Table dataSource={posts} columns={columns}></Table>
+                ​{" "}
+                <Table
+                  dataSource={posts}
+                  columns={columns}
+                  pagination={pagination}
+                ></Table>
               </div>
             ) : (
               <Table dataSource={college} columns={columnsTwo}></Table>
